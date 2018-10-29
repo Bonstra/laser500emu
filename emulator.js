@@ -75,7 +75,22 @@ let speaker_B = 0;
 let joy0 = 255;
 let joy1 = 255;
 
+let fdc = new Fdc();
+let drives = Array(2);
 let cpu = new Z80({ mem_read, mem_write, io_read, io_write });
+
+drives[0] = new Fdd();
+for (let i = 0; i < drives.length; i++) {
+   if (!drives[i])
+      continue;
+   fdc.setDrive(i, drives[i]);
+   drives[i].setDrvselCallback(state => {
+      fdd_update_drvsel(i, state);
+   });
+   drives[i].setTrackCallback(track => {
+      fdd_update_track(i, track);
+   });
+}
 
 /******************/
 

@@ -38,10 +38,45 @@ window.onbeforeunload = function(e) {
    saveState();   
  };
 
+const fdd0Panel = document.getElementById('fdd0');
+// **** FDD panels *****
+function fdd_update_drvsel(idx, state) {
+   var indicators;
+   if (idx == 0) {
+      indicators = fdd0Panel.getElementsByClassName("indicator");
+   } else {
+      return;
+   }
+   for (let i of indicators) {
+      if (i.getAttribute("name") != "drvsel")
+         continue;
+      const led = i.getElementsByClassName("led");
+      if (led.length == 0)
+         continue;
+      led[0].setAttribute("state", state ? "on" : "off");
+   };
+}
+
+function fdd_update_track(idx, track) {
+   var indicators;
+   if (idx == 0) {
+      indicators = fdd0Panel.getElementsByClassName("indicator");
+   } else {
+      return;
+   }
+   for (let i of indicators) {
+      if (i.getAttribute("name") != "trackno")
+         continue;
+      const span = i.getElementsByClassName("trackno");
+      if (span.length == 0)
+         continue;
+      span[0].textContent = "" + track + "";
+   };
+}
+
 // **** drag & drop ****
 
 const dropZone = document.getElementById('canvas');
-
 // Optional.   Show the copy icon when dragging over.  Seems to only work for chrome.
 dropZone.addEventListener('dragover', function(e) {
    e.stopPropagation();
@@ -60,6 +95,57 @@ dropZone.addEventListener('drop', e => {
       reader.onload = e2 => droppedFile(file.name, e2.target.result);
       reader.readAsArrayBuffer(file); 
    }
+});
+
+fdd0Panel.addEventListener('dragover', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    e.currentTarget.setAttribute("drag-target", "yes");
+});
+
+fdd0Panel.addEventListener('dragleave', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.currentTarget.setAttribute("drag-target", "no");
+});
+
+fdd0Panel.addEventListener('drop', e => {
+   const panel = e.currentTarget;
+   e.stopPropagation();
+   e.preventDefault();
+   panel.setAttribute("drag-target", "no");
+   if (e.dataTransfer.files.length != 1) {
+      console.warn("Expected only 1 dropped file, got " + e.dataTransfer.files.length + ".");
+      return;
+   }
+   const file = e.dataTransfer.files[0];
+
+   const reader = new FileReader();
+   reader.onload = e2 => {
+      if (!e2.lengthComputable) {
+         console.error("Cannot determine image size.");
+         e2.target.abort();
+         return;
+      }
+      if (e2.total > 10000000) {
+         console.error("File is too large.");
+         e2.target.abort();
+         return;
+      }
+      // File loaded
+      if (e2.loaded == e2.total) {
+         if (drives[0].loadDisk(e2.target.result)) {
+            panel.getElementsByClassName('filename')[0].textContent = file.name;
+         } else {
+            panel.getElementsByClassName('filename')[0].textContent = "(invalid image)";
+         }
+      }
+   };
+   reader.onabort = e2 => {
+      panel.getElementsByClassName('filename')[0].textContent = "(failed to load image file)";
+   };
+   reader.readAsArrayBuffer(file);
 });
 
 function droppedFile(outName, bytes) {   

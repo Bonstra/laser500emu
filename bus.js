@@ -73,8 +73,7 @@ function io_read(port) {
       case 0x11:
       case 0x12:
       case 0x13:
-      case 0x14:
-         return floppy_read_port(port & 0xFF);   
+         return fdc.ioRead(port & 0xFF, Math.trunc((cycles * 1000000) / cpuSpeed));
    }
    console.warn(`read from unknown port ${hex(port)}h`);
    return 0x00;
@@ -119,8 +118,7 @@ function io_write(port, value) {
       case 0x11:
       case 0x12:
       case 0x13:
-      case 0x14:
-         return floppy_write_port(port & 0xFF, value);      
+         return fdc.ioWrite(port & 0xFF, value, Math.trunc((cycles * 1000000) / cpuSpeed));
       default:
          console.warn(`write on unknown port ${hex(port)}h value ${hex(value)}h`);
    }   

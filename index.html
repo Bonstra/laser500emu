@@ -21,6 +21,42 @@
             position: absolute;
          }
       </style>
+      <style>
+         .fdd-panel {
+            display: block;
+            position: relative;
+            height: 8vmin;
+            width: 20vmin;
+            background-color: gray;
+            font-family: sans;
+            font-weight: bold;
+            font-size: 2vmin;
+            color: white;
+         }
+         .fdd-panel[drag-target="yes"] {
+            background-color: darkgreen;
+         }
+         .fdd-panel > .filename {
+            color: yellow;
+         }
+         .fdd-panel > .indicator {
+            position: relative;
+            display: inline-block;
+         }
+         .fdd-panel > .indicator > .trackno {
+
+         }
+         .fdd-panel > .indicator > .led {
+            display: block;
+            background-color: darkred;
+            height: 2vmin;
+            width: 3vmin;
+            padding: 0.25vmin;
+         }
+         .fdd-panel > .indicator > .led[state="on"] {
+            background-color: red;
+         }
+      </style>
    </head>
    
 
@@ -36,6 +72,16 @@
    <canvas id="canvas" style="height: 625px; width: 720px;">&nbsp;</canvas>
    -->
    <canvas id="canvas" style="display: block; height: 83vmin; width: 100vmin; margin: auto">&nbsp;</canvas>
+   <div id="fdd0" class="fdd-panel" drag-target="no">
+      <div class="title">FDD0</div>
+      <div class="filename">(empty)</div>
+      <div class="indicator" name="drvsel">
+         <div class="led" state="off">EN</div>
+      </div>
+      <div class="indicator" name="trackno">
+         <div>Trk <span class="trackno">??</span></div>
+      </div>
+   </div>
 
    <!-- allows to "Save As..." programs from the emulator -->
    <script type="text/javascript" src="FileSaver.js"></script>

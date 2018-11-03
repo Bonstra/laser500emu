@@ -375,7 +375,10 @@ Fdd.prototype.writeBits = function(trk, bitpos, data, num) {
 
 // Get the current track number
 Fdd.prototype.getCurrentTrack = function() {
-    return (this.head_half_step + 2) >> 2;
+    let track = (this.head_half_step + 2) >> 2;
+    if (track > 39)
+        track = 39;
+    return track;
 }
 
 Fdd.prototype.setPhases = function(phy0, phy1, phy2, phy3) {
